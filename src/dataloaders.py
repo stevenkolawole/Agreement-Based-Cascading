@@ -16,7 +16,7 @@ class Dataset:
         with open(self.PROMPT_TEMPLATE_FILE, "r") as f:
             self.base_prompt = f.read()
         
-        self._FOLDER = f"scorer_logs/{self.data_url.split("/")[-1]}/"
+        self._FOLDER = f"scorer_logs/{self.data_url.split('/')[-1]}/"
         if train_frugalgpt_scorer:
             self.process_data_for_training()
             self.train_frugalgpt_scorer()
@@ -97,3 +97,6 @@ class GSM8KDataset(Dataset):
 
 
 test = OverrulingDataset(train_frugalgpt_scorer=True)
+test2 = HeadlineDataset(train_frugalgpt_scorer=True)
+test3 = CoQADataset(train_frugalgpt_scorer=True)
+test4 = GSM8KDataset(train_frugalgpt_scorer=True)
