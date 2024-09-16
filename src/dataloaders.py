@@ -3,7 +3,8 @@ from methods.frugalgpt_scorer import Scorer
 
 class Dataset:
     label_column = 'label'
-    required_attributes = ['data_url', 'query_column', 'PROMPT_TEMPLATE_FILE']
+    label_regex = r'Answer:\s*(.*)'
+    required_attributes = ['data_url', 'query_column', 'PROMPT_PREFIX']
 
     def __init__(self, train_frugalgpt_scorer=False):
         for attr in self.required_attributes:
@@ -13,7 +14,7 @@ class Dataset:
         self.data = self.load_data(self.data_url)
         self.train_data, self.val_data = self.preprocess()
 
-        with open(self.PROMPT_TEMPLATE_FILE, "r") as f:
+        with open(self.PROMPT_PREFIX, "r") as f:
             self.base_prompt = f.read()
         
         self._FOLDER = f"scorer_logs/{self.data_url.split('/')[-1]}/"
@@ -27,9 +28,8 @@ class Dataset:
     def preprocess(self):
         return (self.data["train"], self.data["test"])
         
-    def process_data_for_training(self):
+    def process_data_for_training(self): # For FrugalGPT's training
         self.train_data = self._process_data(self.train_data)
-        print(self.train_data)
         self.val_data = self._process_data(self.val_data)
 
     def _process_data(self, dataset):
@@ -53,7 +53,8 @@ class Dataset:
 class OverrulingDataset(Dataset):
     data_url = "LawInformedAI/overruling"
     query_column = "sentence1"
-    PROMPT_TEMPLATE_FILE = "src/prompt_templates/overruling.txt"
+    label_regex = r'Answer:\s*(\b[01]\b)'
+    PROMPT_PREFIX = "src/prompt_templates/overruling.txt"
 
     def preprocess(self):
         data_split = self.data['train'].train_test_split(test_size=.4)
@@ -64,20 +65,21 @@ class HeadlineDataset(Dataset):
     data_url = "steve1989/financial_news_headlines"
     query_column = "Headlines"
     label_column = "sentiment_label"
-    PROMPT_TEMPLATE_FILE = "src/prompt_templates/headlines.txt"
+    label_regex = r'Answer:\s*(\b(?:up|down|neutral|none)\b)'
+    PROMPT_PREFIX = "src/prompt_templates/headlines.txt"
 
 
 class CoQADataset(Dataset):
     data_url = "stanfordnlp/coqa"
     query_column = "context_and_question"
     label_column = "answer"
-    PROMPT_TEMPLATE_FILE = "src/prompt_templates/coqa.txt"
+    PROMPT_PREFIX = "src/prompt_templates/coqa.txt"
 
     def add_story_with_first_qa(self, example):
         story = example['story']
         first_question = example['questions'][0]
         example[self.label_column] = example['answers']['input_text'][0]
-        example[self.query_column] = f"Context: {story}\nQ: {first_question}"
+        example[self.query_column] = f"{story}\nQuestion: {first_question}"
         return example
 
     def preprocess(self):
@@ -90,7 +92,8 @@ class GSM8KDataset(Dataset):
     data_url = "openai/gsm8k"
     query_column = "question"
     label_column = "answer"
-    PROMPT_TEMPLATE_FILE = "src/prompt_templates/gsm8k.txt"
+    label_regex = r'####\s*(-?\d+(?:\.\d+)?)' # overwrite Dataset's regex
+    PROMPT_PREFIX = "src/prompt_templates/gsm8k.txt"
 
     def load_data(self, HF_URL):
         return load_dataset(HF_URL, "main")
