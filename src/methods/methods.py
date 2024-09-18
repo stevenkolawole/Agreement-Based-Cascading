@@ -91,12 +91,12 @@ class EnsembleCascade(CascadeMethod):
                 f_responses = extract_answer(responses, self.Task.label_regex)
                 majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
                 consistency = (majority_count / len(f_responses)) >= self._threshold
-                print(majority_answer, majority_count)
-                print(responses)
-                print(f_responses)
+#                print(majority_answer, majority_count)
+#                print(responses)
+#                print(f_responses)
                 if consistency and majority_answer != "": 
                     break
-            print("Exiting at tier ", tier)
+#            print("Exiting at tier ", tier)
             self.total_latency += time() - start_time
             answers.append(majority_answer)
         return answers, self.total_latency / len(prompts)
@@ -134,10 +134,11 @@ def extract_answer(raw_responses: Union[List[str], str], regex_pattern: str) -> 
             if matches:
                 responses.append(matches[-1])
             else:
-                print("Pattern error in regex.")
+                print("Pattern match error!")
                 responses.append("")
+                
         except AttributeError:
-            print(f"Answer not found in ==> `{r}`\n\n")
+            print("Answer not found in ==> `{r}`\n\n") # add f-string later
             responses.append("")
             
     return responses
