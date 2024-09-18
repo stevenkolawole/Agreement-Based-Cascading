@@ -13,8 +13,7 @@ class ServiceProvider:
 
     def __init__(self, TaskData):
         self.client = self.Provider(api_key=self.API_KEY)
-        self.TEMPLATE = TaskData.PROMPT_PREFIX
-        self.pattern_to_match = TaskData.label_regex
+        self.TEMPLATE = TaskData.base_prompt
 
     def call_api(self, prompt: str, model: str, temperature: float = 0.6) -> Tuple[str, int]:
         chat_completion = self.client.chat.completions.create(
@@ -41,7 +40,7 @@ class ServiceProvider:
         raise NotImplementedError("Subclasses must calculate costs in their own specific way.")
 
 
-class TogetherAPI(ServiceProvider):
+class TogetherAIAPI(ServiceProvider):
     Provider = Together
     API_KEY = os.getenv('TOGETHER_API_KEY')
     
@@ -84,7 +83,7 @@ class TogetherAPI(ServiceProvider):
         
         return (total_tokens / 1_000_000) * price_per_million
 
-class OpenAI(ServiceProvider):
+class OpenAIAPI(ServiceProvider):
     Provider = OpenAI
     API_KEY = os.getenv("OPENAI_API_KEY")
 

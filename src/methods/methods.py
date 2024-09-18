@@ -46,19 +46,25 @@ class CascadeMethod:
         return responses
     
     def _process_in_parallel(self, items, func) -> Union[List[str], Tuple[List[str], List[int]]]:
-        with ThreadPoolExecutor(max_workers=len(items)) as executor:
+        with ThreadPoolExecutor(max_workers=len(list(items))) as executor:
             results = list(executor.map(func, items))
         return results
     
     def _inference_cascade(self):
-        raise NotImplementedError("Subclasses must calculate costs in their own specific way.")
+        raise NotImplementedError("Subclasses must their cascade logic in their own specific way.")
     
-    def inference_cascade(self, len_data: int = 25):
+    def inference_cascade(self, len_data: int = None):
+        if len_data == None: len_data = self.Task.val_data.num_rows
+        
         prompts = self.Task.val_data[self.Task.query_column][:len_data]
         labels = self.Task.val_data[self.Task.label_column][:len_data]
-        formatted_labels = extract_answer(labels, self.Task.label_regex)
+        if self.Task.groundtruth_need_regex:
+            labels = extract_answer(labels, self.Task.label_regex)
+
+        print("Starting inference engine...")
         predictions, avg_latency = self._inference_cascade(prompts)
-        accuracy = calculate_accuracy(predictions, formatted_labels)
+        print("Calculating accuracy with offline labels...")
+        accuracy = calculate_accuracy(predictions, labels)
         return accuracy, avg_latency, self.total_cost
     
 
@@ -85,10 +91,14 @@ class EnsembleCascade(CascadeMethod):
                 f_responses = extract_answer(responses, self.Task.label_regex)
                 majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
                 consistency = (majority_count / len(f_responses)) >= self._threshold
+                print(majority_answer, majority_count)
+                print(responses)
+                print(f_responses)
                 if consistency and majority_answer != "": 
                     break
+            print("Exiting at tier ", tier)
             self.total_latency += time() - start_time
-            answers.append[majority_answer]
+            answers.append(majority_answer)
         return answers, self.total_latency / len(prompts)
     
 
@@ -99,7 +109,7 @@ class MOTLLMCascade(EnsembleCascade):
         TaskData,
         cascade_tier_models: List[Union[List[str], str]],
         temperature: Union[List[str], str] = [0.4, 0.6, 0.8],
-        mixture_consistency_threshold: float = 2/3 # (2/3) or full agreement = 1.0
+        mixture_consistency_threshold: float = 2/3 # (2/3) or full consistency check = 1.0
     ):
         super().__init__(ServiceProvider, TaskData, cascade_tier_models, temperature)
         self._threshold = mixture_consistency_threshold
@@ -117,14 +127,21 @@ def extract_answer(raw_responses: Union[List[str], str], regex_pattern: str) -> 
     responses = []
     if isinstance(raw_responses, str): # for cases where we have just a single model response
         raw_responses = [raw_responses]
+
     for r in raw_responses:
         try:
-            responses.append(re.search(regex_pattern, r).group(1))
+            matches = re.findall(regex_pattern, r)
+            if matches:
+                responses.append(matches[-1])
+            else:
+                print("Pattern error in regex.")
+                responses.append("")
         except AttributeError:
-            print("Answer not found in ==> `{}`\n\n")
+            print(f"Answer not found in ==> `{r}`\n\n")
             responses.append("")
-        return responses
+            
+    return responses
 
 def calculate_accuracy(pred: List[str], true_labels: List[str]) -> float:
-    correct_count = sum(p == t for p, t in zip(pred, true_labels))
+    correct_count = sum(p == str(t) for p, t in zip(pred, true_labels))
     return correct_count / len(pred)
