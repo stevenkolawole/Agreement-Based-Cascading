@@ -154,16 +154,16 @@ class FrugalGPT(CascadeMethod):
 
     def _process_data_for_training(self, tier, len_data=None):
         if not len_data: 
-            len_data = min(100, self.Task.train_data.num_rows)
+            len_data = min(500, self.Task.train_data.num_rows)
             print("Training samples set to ", len_data)
         temp_data = self.Task.train_data.select(range(len_data)).train_test_split(test_size=.2)
         self._temp_train, self._temp_val = temp_data['train'], temp_data['test']
+        print("Generating inference on data subset for training...")
         self._temp_train = self._generate_label_process_data(tier, self._temp_train)
         self._temp_val = self._generate_label_process_data(tier, self._temp_val)
     
     def _generate_label_process_data(self, tier, data, len_data=100):
         raw_responses = []
-        print("Generating inference on data subset for training...")
         prompts = []
         for prompt in data[self.Task.query_column]:
             prompts.append(prompt)
@@ -211,7 +211,7 @@ class FrugalGPT(CascadeMethod):
             f_response = extract_answer(response, self.Task.label_regex)[0]
             answers.append(f_response)
             self.total_latency += time() - start_time
-        print(f"Setup cost in $$: {self.setup_cost}\nSetup latency: {self.setup_latency}")
+        print(f"\nSetup cost in $$: {self.setup_cost}\nSetup latency: {self.setup_latency}")
         return answers, self.total_latency / len(prompts)
     
 
