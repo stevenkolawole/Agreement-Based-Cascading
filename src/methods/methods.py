@@ -55,7 +55,7 @@ class CascadeMethod:
         raise NotImplementedError("Subclasses must their cascade logic in their own specific way.")
     
     def inference_cascade(self, len_data: int = None):
-        if len_data == None: len_data = self.Task.val_data.num_rows
+        if len_data == None: len_data = min(100, self.Task.val_data.num_rows)
         
         prompts = self.Task.val_data[self.Task.query_column][:len_data]
         labels = self.Task.val_data[self.Task.label_column][:len_data]
@@ -152,13 +152,16 @@ class FrugalGPT(CascadeMethod):
         self._process_data_for_training(tier)
         return self._train_on_processed_data(tier)
 
-    def _process_data_for_training(self, tier):
-        temp_data = self.Task.train_data.train_test_split(test_size=.4)
+    def _process_data_for_training(self, tier, len_data=None):
+        if not len_data: 
+            len_data = min(100, self.Task.train_data.num_rows)
+            print("Training samples set to ", len_data)
+        temp_data = self.Task.train_data.select(range(len_data)).train_test_split(test_size=.2)
         self._temp_train, self._temp_val = temp_data['train'], temp_data['test']
         self._temp_train = self._generate_label_process_data(tier, self._temp_train)
         self._temp_val = self._generate_label_process_data(tier, self._temp_val)
     
-    def _generate_label_process_data(self, tier, data):
+    def _generate_label_process_data(self, tier, data, len_data=100):
         raw_responses = []
         print("Generating inference on data subset for training...")
         prompts = []
