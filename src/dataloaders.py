@@ -1,5 +1,4 @@
 from datasets import load_dataset
-from .methods.frugalgpt_scorer import Scorer
 
 class Dataset:
     label_column = 'label'
