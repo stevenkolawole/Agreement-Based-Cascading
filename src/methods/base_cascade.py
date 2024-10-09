@@ -25,6 +25,8 @@ class CascadeMethod:
     def generate_inference(self, prompt: str, 
                            models: Union[List[str], str],
                            temp: Union[List[float], float] = None,
+                           n: str = 1,
+                           add_task_fewshot=True,
                            ) -> Union[str, List[str]]:
         if temp == None: temp = self.temp
         if isinstance(models, list): 
@@ -42,7 +44,7 @@ class CascadeMethod:
             cost = self.Service.calculate_cost(models, tokens) # same model is used 3x
         else: 
             # Singular model and singular temperature
-            responses, tokens = self.Service.call_api(prompt, models, temp)
+            responses, tokens = self.Service.call_api(prompt, models, temp, n=n, add_task_fewshot=add_task_fewshot)
             cost = self.Service.calculate_cost(models, tokens)
 
         self.total_tokens += tokens

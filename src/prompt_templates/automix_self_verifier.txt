@@ -1,0 +1,51 @@
+"""### Few-shot examples:
+
+Prompt: The manuscript, discovered in 1980 in a dusty attic, turned out to be a lost work of Shakespeare. Whose lost work was discovered in a dusty attic in 1980?
+AI Generated Answer: Shakespeare
+Instruction: Your task is to evaluate if the AI Generated Answer is correct, based on the provided context and question. Provide the judgement and reasoning for each case. Choose between Correct or Incorrect.
+1. Reasoning: The context specifically mentions that a lost work of Shakespeare was discovered in 1980 in a dusty attic.
+2. Verification Decision: [Decision: Correct]
+
+---
+
+Prompt: The celestial event, known as the Pink Moon, is unique to the month of April and has cultural significance in many indigenous tribes.
+Question: In which month does the celestial event, the Pink Moon, occur?
+AI Generated Answer: July
+Instruction: Your task is to evaluate if the AI Generated Answer is correct, based on the provided context and question. Provide the judgement and reasoning for each case. Choose between Correct or Incorrect.
+1. Reasoning: The context clearly states that the Pink Moon is unique to the month of April.
+2. Verification Decision: [Decision: Incorrect]
+
+---
+
+Prompt: Jasper will serve charcuterie at his dinner party. He buys 2 pounds of cheddar cheese for $10, a pound of cream cheese that cost half the price of the cheddar cheese, and a pack of cold cuts that cost twice the price of the cheddar cheese. How much does he spend on the ingredients?
+AI Generated Answer: A pound of cream cheese cost $10 / 2 = $<<10/2=5>>5. A pack of cold cuts cost $10 x 2 = $<<10*2=20>>20. Jasper spent $10 + $5 + $20 = $<<10+5+20=35>>35 on the ingredients.\n#### 35
+Instruction: Your task is to evaluate if the AI Generated Answer is correct, based on the provided context and question. Provide the judgement and reasoning for each case. Choose between Correct or Incorrect.
+1. Reasoning: The step-by-step logic of the answer supports the context of the question.
+2. Verification Decision: [Decision: Correct]
+
+---
+
+Prompt: The Mona Lisa, housed in the Louvre Museum, is believed to be a portrait of Lisa Gherardini, painted by Leonardo da Vinci in the early 16th century. Who is believed to have painted the Mona Lisa in the early 16th century?
+AI Generated Answer: Vincent van Gogh
+Instruction: Your task is to evaluate if the AI Generated Answer is correct, based on the provided context and question. Provide the judgement and reasoning for each case. Choose between Correct or Incorrect.
+1. Reasoning: The context specifies that the Mona Lisa was painted by Leonardo da Vinci in the early 16th century.
+2. Verification Decision: [Decision: Incorrect]
+
+---
+
+Prompt: The planet Kepler-442b, located 1,100 light-years away, is one of the most Earth-like planets ever discovered, having a similar size and orbiting within its star's habitable zone.
+Question: How far away is the planet Kepler-442b?
+AI Generated Answer: 1,100 light-years
+Instruction: Your task is to evaluate if the AI Generated Answer is correct, based on the provided context and question. Provide the judgement and reasoning for each case. Choose between Correct or Incorrect.
+1. Reasoning: The context states that Kepler-442b is located 1,100 light-years away.
+2. Verification Decision: [Decision: Correct]
+
+---
+
+### Actual input:
+
+Prompt: {prompt}
+AI Generated Answer: {answer}
+Instruction: Your task is to evaluate if the AI Generated Answer is correct, based on the provided context and question. Provide the judgement and reasoning for each case. Choose between Correct or Incorrect. Return your response in the following structured format:
+1. Reasoning: <Provide clear reasoning for your decision>
+2. Verification Decision: [Decision: Correct | Incorrect]"""

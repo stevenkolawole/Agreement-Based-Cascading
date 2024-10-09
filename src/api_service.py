@@ -12,7 +12,9 @@ class ServiceProvider:
         self.client = self.Provider(api_key=self.API_KEY)
         self.TEMPLATE = TaskData.base_prompt
 
-    def call_api(self, prompt: str, model: str, temperature: float = 0.6) -> Tuple[str, int]:
+    def call_api(self, prompt: str, model: str, temperature: float = 0.6, n: int = 1, add_task_fewshot: bool = True) -> Tuple[str, int]:
+        if add_task_fewshot:
+            prompt = self.TEMPLATE + prompt
         chat_completion = self.client.chat.completions.create(
             messages=[
                 {
@@ -22,14 +24,18 @@ class ServiceProvider:
                 },
                 {
                     "role": "user",
-                    "content": self.TEMPLATE + prompt,
+                    "content": prompt,
                 }
             ],
             model=model,
-            max_tokens=1024,
+            n=n,
+            max_tokens=8192,
             temperature=temperature,
         )
-        completion = chat_completion.choices[0].message.content
+        if n > 1:
+            completion = [chat_completion.choices[i].message.content for i in range(n)]
+        else:
+            completion = chat_completion.choices[0].message.content
         total_tokens = chat_completion.usage.total_tokens
         return completion, total_tokens
 

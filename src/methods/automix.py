@@ -1,3 +1,4 @@
+import re
 from typing import List, Union, Tuple
 from concurrent.futures import ThreadPoolExecutor
 from time import time
@@ -146,22 +147,39 @@ class AutoMix(CascadeMethod):
         verifier_scores = []
         for prompt, answer in zip(prompts, answers):
             verifier_prompt = self._make_verifier_input(prompt, answer)
-            verifier_response = self.generate_inference(verifier_prompt, model, temp=1.0) ### K times
-            score = self._compute_verification_score(verifier_response)
+            # K times = 8
+            verifier_responses = self.generate_inference(verifier_prompt, model, temp=1.0, n=8, add_task_fewshot=False)
+            score = self._compute_verification_score(verifier_responses)
+            print(verifier_responses)
             verifier_scores.append(score)
         return verifier_scores
 
     def _make_verifier_input(self, prompt: str, answer: str) -> str:
-        ### Implement verifier prompt creation logic here ### FIX LATER; ADD PROMPT PREFIX
-        return f"Verify the following answer to the question: Question: {prompt} Answer: {answer}"
+        with open("src/prompt_templates/automix_self_verifier.txt", "r") as f:
+            verifier_fewshot = f.read()
+        verifier_input = verifier_fewshot.format(prompt=prompt, answer=answer)
+        verifier_input_as_list = verifier_input.split(" ")# to check for context length limit
+        if len(verifier_input_as_list) > 8100: 
+            verifier_input_as_list = verifier_input_as_list[-8100:]
+            verifier_input = " ".join(verifier_input_as_list)
+        
+        return verifier_input
 
-    def _compute_verification_score(self, verifier_response: str) -> float:
-        ### Implement verification score computation logic here ### FIX LATER; POTENTIAL BUG
-        if "incorrect" in verifier_response.lower():
-            return 0.0
-        if "correct" in verifier_response.lower():
-            return 1.0
-        return 0.5  # Placeholder
+    def _compute_verification_score(self, verifier_responses: str) -> float:
+        # Define a regex pattern to capture the verification decision
+        decision_pattern = re.compile(r"Verification Decision:\s*\[Decision:\s*(Correct|Incorrect)\]", re.IGNORECASE)
+        total_valid = 0
+        correct_count = 0
+        for item in verifier_responses:
+            match = decision_pattern.search(item)
+            if match:
+                total_valid += 1
+                if match.group(1).lower() == "correct":
+                    correct_count += 1
+        print("valid and correct,", total_valid, correct_count)
+        if total_valid == 0:
+            return 0
+        return correct_count / total_valid
 
     def _inference_cascade(self, prompts: List[str]) -> Tuple[List[str], float]:
         answers = []
@@ -192,6 +210,7 @@ class AutoMix(CascadeMethod):
     def _get_nearest_prob_idx(self, prob: float) -> int:
         # return min(int(prob // self.gap), self.num_bins)
         x = min(int(prob // self.gap), self.num_bins)
+        print ("Prob minus self.gap", prob // self.gap)
         print("Nearest prob idx", x)
         return x
     
