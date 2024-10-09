@@ -1,18 +1,18 @@
-Complete the text by determining whether it is overruling (i.e., 1) or non-overruling (i.e., 0), in the format of the preceding samples. In law, an overruling sentence is a statement that nullifies a previous case decision as a precedent by a constitutionally valid statute or a decision by the same or higher ranking court which establishes a different rule on the point of law involved. Do not add any other information asides from "Answer: 0" or "Answer: 1".
+### Few-shot Examples:
 
 Question: for the reasons that follow, we approve the first district in the instant case and disapprove the decisions of the fourth district.
-Answer: 1
-
-Question: to the extent that this dictum is inconsistent with our holding here, we expressly overrule it.
 Answer: 1
 
 Question: the forest preserve foreclosed and then bought the property at the foreclosure auction.
 Answer: 0
 
+Question: the components of the second inquirycompetency and complexityare ""necessarily intertwined,"" id. at 655, but the district court must still address both elements, id. at 649, 55. though ""we have resisted laying down categorical rules regarding recruitment of counsel,"" id. at 656, (and we continue to do so in this case), we have previously held that a district court abuses its discretion when it does not take note of ""certain circumstances [that] demand particular judicial consideration.""
+Answer: 0
+
 Question: however, in our opinion, the loustalot case should be overruled for the reason that it misinterprets the decision of the supreme court in edwards v. royal indemnity company, 182 la. 171, 161 so. 191, where a different result was reached.
 Answer: 1
 
-Question: the components of the second inquirycompetency and complexityare ""necessarily intertwined,"" id. at 655, but the district court must still address both elements, id. at 649, 55. though ""we have resisted laying down categorical rules regarding recruitment of counsel,"" id. at 656, (and we continue to do so in this case), we have previously held that a district court abuses its discretion when it does not take note of ""certain circumstances [that] demand particular judicial consideration.""
-Answer: 0
+### Actual Input:
+Instruction: Complete the text by determining whether it is overruling (i.e., 1) or non-overruling (i.e., 0), in the format of the preceding samples. In law, an overruling sentence is a statement that nullifies a previous case decision as a precedent by a constitutionally valid statute or a decision by the same or higher ranking court which establishes a different rule on the point of law involved. Do not add any other information asides from "Answer: 0" or "Answer: 1".
 
 Question: 

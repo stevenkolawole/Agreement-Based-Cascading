@@ -1,27 +1,18 @@
-Please complete this text by determining the price direction (up, down, neutral, or none) in the last news headline. Follow the format of the preceding news headlines (e.g., "Answer: down"); do not add any additional information.
+### Few-shot examples:
 
 Question: december gold down $1 at $749 an ounce on nymex
-Answer: down
+Answer: Negative
 
 Question: august gold up $7.60 at $878.80 an ounce on nymex
-Answer: up
+Answer: Positive
 
-Question: commodity outlook: gold may find it tough to top 30,920 level
-Answer: none
+Question: With a sharp 7% increase in Q1FY24, is it wise to buy, hold or sell Dabur India stock?
+Answer: Negative
 
-Question: gold prices at 1-week lows as dollar remains supported
-Answer: neutral
+Question: E-platform to come in handy for Nashik grape growers
+Answer: Neutral
 
-Question: illegal flow of gold to nepal from india across porous border showing upward swing
-Answer: none
-
-Question: gold prices steady in early asia trade with focus on hong kong
-Answer: neutral
-
-Question: gold adds 0.7% to trade at record $1,601.50/oz
-Answer: up
-
-Question: gold loses sheen on muted demand, silver also eases
-Answer: down
+### Actual Input
+Instruction: Please complete this text by determining the price direction (Positive, Negative, or Neutral) in the last news headline. Follow the format of the preceding news headlines (e.g., "Answer: Neutral"); do not add any additional information.
 
 Question: 
