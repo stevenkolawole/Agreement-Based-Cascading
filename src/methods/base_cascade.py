@@ -72,6 +72,7 @@ class CascadeMethod:
         else:
             print("Calculating accuracy with offline labels...")
             accuracy = calculate_accuracy(predictions, labels)
+        print(accuracy, self.total_cost, avg_latency, '\n\n')
         return accuracy, avg_latency, self.total_cost
         
     def _inference_cascade(self):
