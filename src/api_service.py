@@ -29,7 +29,7 @@ class ServiceProvider:
             ],
             model=model,
             n=n,
-            max_tokens=8192,
+            max_tokens=4096,
             temperature=temperature,
         )
         if n > 1:
@@ -54,9 +54,11 @@ class TogetherAIAPI(ServiceProvider):
         # Check for "lite" or "turbo" in the model name
         is_lite = 'lite' in model.lower()
         is_turbo = 'turbo' in model.lower()
+        is_moe = '8x22b' in model.lower() # hack for WizardLM MOE
 
         # Define the pricing tiers FOR LLaMa models
         price_tiers = {
+            3: {'turbo': 0.06},
             8: {'lite': 0.10, 'turbo': 0.18, 'standard': 0.20},
             70: {'lite': 0.54, 'turbo': 0.88, 'standard': 0.90},
             405: {'turbo': 5.00}  # No 'lite' or 'standard' pricing for 405B
@@ -70,6 +72,8 @@ class TogetherAIAPI(ServiceProvider):
                 price_per_million = price_tiers[model_size].get('turbo')
             else:
                 price_per_million = price_tiers[model_size].get('standard')
+        elif is_moe: # hack for wizardLM
+            price_per_million = 1.20
         else:
             # Fallback to a default pricing structure if size is not explicitly listed
             price_per_million = next(
