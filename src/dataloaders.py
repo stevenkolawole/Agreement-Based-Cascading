@@ -38,7 +38,7 @@ class HeadlineDataset(Dataset):
     data_url = "steve1989/financial_news_headlines"
     query_column = "Headlines"
     label_column = "sentiment_label"
-    label_regex = r'Answer:\s*(\b(?:up|down|neutral|none)\b)'
+    label_regex = r'Answer:\s*(\b(?:Negative|Positive|Neutral)\b)'
     PROMPT_PREFIX_FILE = "src/prompt_templates/headlines.txt"
 
 
