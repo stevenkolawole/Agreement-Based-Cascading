@@ -27,11 +27,11 @@ class EnsembleCascade(CascadeMethod):
             for tier in range(self.n_tiers):
                 responses = self.generate_inference(prompt=prompt, models=self.cascade_models[tier])
                 f_responses = extract_answer(responses, self.Task.label_regex)
-                if tier != len(self.n_tiers - 1): # don't bother for the last layer
-                    majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
-                    consistency = (majority_count / len(f_responses)) >= self._threshold
-                    if consistency and majority_answer != "": 
-                        break
+                # if tier != (self.n_tiers - 1): # don't bother for the last layer
+                majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
+                consistency = (majority_count / len(f_responses)) >= self._threshold
+                if consistency and majority_answer != "": 
+                    break
             # print("Exiting at tier ", tier)
             self.total_latency += time() - start_time
             answers.append(majority_answer)
