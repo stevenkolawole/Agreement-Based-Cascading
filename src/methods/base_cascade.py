@@ -2,8 +2,8 @@ from typing import List, Tuple, Union
 from concurrent.futures import ThreadPoolExecutor
 from time import time
 
-from .utils import extract_answer, calculate_accuracy
-
+from .utils import extract_answer, calculate_accuracy, calculate_f1
+from ..dataloaders import CoQADataset # need it to check for F1
 
 class CascadeMethod:
     def __init__(
@@ -66,8 +66,12 @@ class CascadeMethod:
 
         print("Starting inference engine...")
         predictions, avg_latency = self._inference_cascade(prompts)
-        print("Calculating accuracy with offline labels...")
-        accuracy = calculate_accuracy(predictions, labels)
+        if isinstance(self.Task, CoQADataset):
+            print("Calculating F1-score with offline labels...")
+            accuracy = calculate_f1(predictions, labels)
+        else:
+            print("Calculating accuracy with offline labels...")
+            accuracy = calculate_accuracy(predictions, labels)
         return accuracy, avg_latency, self.total_cost
         
     def _inference_cascade(self):

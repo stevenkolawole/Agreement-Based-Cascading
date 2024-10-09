@@ -7,7 +7,7 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter
 
 from .base_cascade import CascadeMethod
-from .utils import extract_answer, calculate_accuracy
+from .utils import extract_answer, calculate_f1
 
 
 class AutoMix(CascadeMethod):
@@ -32,7 +32,7 @@ class AutoMix(CascadeMethod):
             self.train_router()
             self.setup_latency = time() - start
             print("Training complete!")
-            print("Results: ", self.tools)
+            print("Routing tools: ", self.tools)
         else: # use self consistency instead
             pass # write load model logic later
 
@@ -70,8 +70,8 @@ class AutoMix(CascadeMethod):
         if self.Task.groundtruth_need_regex:
             labels = extract_answer(labels, self.Task.label_regex)
         
-        slm_perf = [int(str(l) == r) for l, r in zip(labels, extract_answer(slm_responses, self.Task.label_regex))]
-        llm_perf = [int(str(l) == r) for l, r in zip(labels, extract_answer(llm_responses, self.Task.label_regex))]
+        slm_perf = calculate_f1(labels, extract_answer(slm_responses, self.Task.label_regex))
+        llm_perf = calculate_f1(labels, extract_answer(llm_responses, self.Task.label_regex))
         
         return pd.DataFrame({
             'prompt': prompts,
@@ -113,7 +113,7 @@ class AutoMix(CascadeMethod):
                 scores = obs_probs[i] * action_array
                 actions.append(np.argmax(scores.sum(axis=1)))
             action_seqs.append(tuple(actions))
-        return max(set(action_seqs), key=action_seqs.count)
+        return list(set(action_seqs))[0] # can optimize w/ `max(set(action_seqs), key=action_seqs.count)`
     
     def _categorize_rows(self):
         p_10_slm = self._temp_df['slm_perf'].quantile(0.10)
@@ -150,7 +150,6 @@ class AutoMix(CascadeMethod):
             # K times = 8
             verifier_responses = self.generate_inference(verifier_prompt, model, temp=1.0, n=8, add_task_fewshot=False)
             score = self._compute_verification_score(verifier_responses)
-            print(verifier_responses)
             verifier_scores.append(score)
         return verifier_scores
 
@@ -171,12 +170,11 @@ class AutoMix(CascadeMethod):
         total_valid = 0
         correct_count = 0
         for item in verifier_responses:
-            match = decision_pattern.search(item)
+            match = decision_pattern.search(item) # can optimize by using findall and picking the last
             if match:
                 total_valid += 1
                 if match.group(1).lower() == "correct":
                     correct_count += 1
-        print("valid and correct,", total_valid, correct_count)
         if total_valid == 0:
             return 0
         return correct_count / total_valid
@@ -188,31 +186,24 @@ class AutoMix(CascadeMethod):
             for tier in range(self.n_tiers):
                 response = self.generate_inference(prompt=prompt, models=self.cascade_models[tier])
                 if tier != self.n_tiers - 1: # not doing this for the last tier
-                    ### consider moving `extract_answer` here
                     verifier_score = self._self_verify(prompt, response, self.cascade_models[tier])[0]
                     if self.routing_strategy == "threshold":
                         if verifier_score > self.tools[tier]["best_param"]:
                             break
                     elif self.routing_strategy == "pomdp":
-                        # action = self.router.get_action(verifier_score, self.tools[tier]["best_param"])
-                        print("Length of best param", len(self.tools[tier]["best_param"]))
                         action = self.tools[tier]["best_param"][self._get_nearest_prob_idx(verifier_score)]
                         if action == 0:
                             break
                     print(response)
             print("Exiting at tier ", tier)
-            f_response = extract_answer(response, self.Task.label_regex)[0] ### consider moving before
+            f_response = extract_answer(response, self.Task.label_regex)[0] 
             answers.append(f_response)
             self.total_latency += time() - start_time
         print(f"\nSetup cost in $$: {self.setup_cost}\nSetup latency: {self.setup_latency}")
         return answers, self.total_latency / len(prompts)
     
     def _get_nearest_prob_idx(self, prob: float) -> int:
-        # return min(int(prob // self.gap), self.num_bins)
-        x = min(int(prob // self.gap), self.num_bins)
-        print ("Prob minus self.gap", prob // self.gap)
-        print("Nearest prob idx", x)
-        return x
+        return min(int(prob // self.gap), self.num_bins)
     
     def evaluate(self, test_data):
         """Function to calculate all those extra AutoMix Performance stuff.
@@ -220,7 +211,7 @@ class AutoMix(CascadeMethod):
         Need to fix later
         """
         predictions, avg_latency = self._inference_cascade(test_data[self.Task.query_column])
-        accuracy = calculate_accuracy(predictions, test_data[self.Task.label_column])
+        accuracy = calculate_f1(predictions, test_data[self.Task.label_column])
         
         slm_performance = np.mean([self.Task.evaluate(self.generate_inference(prompt, self.cascade_models[0])) for prompt in test_data[self.Task.query_column]])
         llm_performance = np.mean([self.Task.evaluate(self.generate_inference(prompt, self.cascade_models[1])) for prompt in test_data[self.Task.query_column]])
