@@ -57,7 +57,7 @@ class CascadeMethod:
         return results
 
     def inference_cascade(self, len_data: int = None):
-        if len_data == None: len_data = min(100, self.Task.val_data.num_rows)
+        if len_data == None: len_data = min(1000, self.Task.val_data.num_rows)
         
         prompts = self.Task.val_data[self.Task.query_column][:len_data]
         labels = self.Task.val_data[self.Task.label_column][:len_data]

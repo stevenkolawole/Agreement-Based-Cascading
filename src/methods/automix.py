@@ -158,8 +158,8 @@ class AutoMix(CascadeMethod):
             verifier_fewshot = f.read()
         verifier_input = verifier_fewshot.format(prompt=prompt, answer=answer)
         verifier_input_as_list = verifier_input.split(" ")# to check for context length limit
-        if len(verifier_input_as_list) > 8100: 
-            verifier_input_as_list = verifier_input_as_list[-8100:]
+        if len(verifier_input_as_list) > 3950: 
+            verifier_input_as_list = verifier_input_as_list[-3950:]
             verifier_input = " ".join(verifier_input_as_list)
         
         return verifier_input
@@ -194,8 +194,7 @@ class AutoMix(CascadeMethod):
                         action = self.tools[tier]["best_param"][self._get_nearest_prob_idx(verifier_score)]
                         if action == 0:
                             break
-                    print(response)
-            print("Exiting at tier ", tier)
+            # print("Exiting at tier ", tier)
             f_response = extract_answer(response, self.Task.label_regex)[0] 
             answers.append(f_response)
             self.total_latency += time() - start_time

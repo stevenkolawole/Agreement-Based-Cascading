@@ -134,11 +134,9 @@ class FrugalGPT(CascadeMethod):
                 if tier != self.n_tiers - 1: # we don't need the check for the last tier
                     score = self.tools[tier]['Scorer'].get_score(f"{prompt}\n{response}")
                     consistency = score > self.tools[tier]['threshold']
-                    print(score)
-                    print(response)
                     if consistency: 
                         break
-            print("Exiting at tier ", tier)
+            # print("Exiting at tier ", tier)
             f_response = extract_answer(response, self.Task.label_regex)[0]
             answers.append(f_response)
             self.total_latency += time() - start_time
