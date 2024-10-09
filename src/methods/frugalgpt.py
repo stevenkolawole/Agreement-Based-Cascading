@@ -13,9 +13,9 @@ class FrugalGPT(CascadeMethod):
             self,
             ServiceProvider,
             TaskData,
-            cascade_tier_models: List[str], # List of str or List of Lists denoting ensembles or single models cascades
+            cascade_tier_models: List[str],
             temperature: float = 0.6,
-            train: bool = False,
+            train: bool = True,
     ):
         super().__init__(ServiceProvider, TaskData, cascade_tier_models, temperature)
         self.tools = {}
@@ -26,17 +26,18 @@ class FrugalGPT(CascadeMethod):
             self.setup_latency = time() - start
             print("Training complete!")
         else:
-            pass # print("Loading complete!")
+            pass # print("Loading complete!") # implement loading logic later
 
     def train_scorer(self):
         for tier in range(self.n_tiers):
             if tier != self.n_tiers - 1: # don't train for last tier
                 print(f"Training the scoring function for {self.cascade_models[tier]}...")
                 self.tools[tier] = {}
-                self.tools[tier]['FOLDER'] = f"scorer_logs/{self.Task.data_url.split('/')[-1]}/{tier}/"
+                self.tools[tier]['FOLDER'] = f"frugalgpt_scorer_logs/{self.Task.data_url.split('/')[-1]}/{tier}/"
                 self.tools[tier]['Scorer'] = self._train_scorer(tier)
+                self.tools[tier]['threshold'] = None # will be computed during optimization
 
-        # After training all scorers, optimize the thresholds
+        # After training all scorers, use the temp scores and accs to optimize the thresholds
         self._temp_scores, self._temp_accuracies = [], []
         self._optimize_thresholds()
 
@@ -48,11 +49,11 @@ class FrugalGPT(CascadeMethod):
         scorer = self._train_on_processed_data(tier)
         self._construct_threshold_data(scorer) # Prepare data for optimization
         return scorer
-
+    
     def _process_data_for_training(self, tier, len_data=None):
         if not len_data: 
             len_data = min(500, self.Task.train_data.num_rows)
-            print("Training samples set to ", len_data)
+            print("Training samples for router set to ", len_data)
         temp_data = self.Task.train_data.select(range(len_data)).train_test_split(test_size=.2)
         self._temp_train, self._temp_val = temp_data['train'], temp_data['test']
         print("Generating inference on data subset for training...")
@@ -115,7 +116,7 @@ class FrugalGPT(CascadeMethod):
                         break
                 else:
                     # If no threshold is met, use the last tier
-                    total_accuracy += accuracies[-1][i]
+                    total_accuracy += accuracies[-1][i] # should it be '-1' or [tier+1]?
             return -total_accuracy / n_samples  # Negative because we want to maximize
 
         # Initial guess: use median scores as starting thresholds
@@ -123,7 +124,7 @@ class FrugalGPT(CascadeMethod):
         # Optimize
         result = optimize.minimize(objective, initial_thresholds, method='Nelder-Mead')
         return result.x
-    
+
     def _inference_cascade(self, prompts: List[str]) -> Tuple[List[str], float]:
         answers = []
         for prompt in prompts:
