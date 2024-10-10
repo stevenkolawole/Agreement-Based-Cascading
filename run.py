@@ -12,6 +12,7 @@ os.environ['TOGETHER_API_KEY'] = '5de421f4d56d44ac7400e98c3cac5dc98e184bc92e297e
 
 ensemble_cascade_2level = [
     [
+        # 'meta-llama/Meta-Llama-3-8B-Instruct-Lite',
         'meta-llama/Llama-3.2-3B-Instruct-Turbo',
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
         'google/gemma-2-9b-it',
@@ -21,6 +22,7 @@ ensemble_cascade_2level = [
 
 ensemble_cascade_3level = [
     [
+        # 'meta-llama/Meta-Llama-3-8B-Instruct-Lite',
         'meta-llama/Llama-3.2-3B-Instruct-Turbo',
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
         'google/gemma-2-9b-it',
