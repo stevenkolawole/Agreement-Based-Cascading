@@ -113,7 +113,7 @@ class AutoMix(CascadeMethod):
                 scores = obs_probs[i] * action_array
                 actions.append(np.argmax(scores.sum(axis=1)))
             action_seqs.append(tuple(actions))
-        return list(set(action_seqs))[0] # can optimize w/ `max(set(action_seqs), key=action_seqs.count)`
+        return max(action_seqs, key=action_seqs.count) # their tetst notebook uses 'list(set(action_seqs))[0]' but its not optimal enough
     
     def _categorize_rows(self):
         p_10_slm = self._temp_df['slm_perf'].quantile(0.10)

@@ -155,7 +155,7 @@ for model in single_models:
         API2, Task2, [model],
     )
     accurracy, avg_latency, total_cost = single_run.inference_cascade()
-    print(accurracy, avg_latency, total_cost)
+    # print(accurracy, avg_latency, total_cost)
     results.append({
         "model": model.split('/')[-1],
         "accuracy": accurracy,
