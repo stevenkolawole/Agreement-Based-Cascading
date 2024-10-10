@@ -22,6 +22,7 @@ class FrugalGPT(CascadeMethod):
         if train:
             print("Training FrugalGPT's scorer functions...")
             start = time()
+            self._temp_scores, self._temp_accuracies = [], [] # to optimize threshold later
             self.train_scorer()
             self.setup_latency = time() - start
             print("Training complete!")
@@ -38,7 +39,6 @@ class FrugalGPT(CascadeMethod):
                 self.tools[tier]['threshold'] = None # will be computed during optimization
 
         # After training all scorers, use the temp scores and accs to optimize the thresholds
-        self._temp_scores, self._temp_accuracies = [], []
         self._optimize_thresholds()
 
         self.setup_cost = self.total_cost # inference costs for training; does not include GPU cost
