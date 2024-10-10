@@ -14,8 +14,7 @@ ensemble_cascade_2level = [
     [
         'meta-llama/Llama-3.2-3B-Instruct-Turbo',
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
-        # 'google/gemma-2-9b-it',
-        'mistralai/Mistral-7B-Instruct-v0.3',
+        'google/gemma-2-9b-it',
     ],
     'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
 ]
@@ -24,14 +23,12 @@ ensemble_cascade_3level = [
     [
         'meta-llama/Llama-3.2-3B-Instruct-Turbo',
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
-        # 'google/gemma-2-9b-it',
-        'mistralai/Mistral-7B-Instruct-v0.3',
+        'google/gemma-2-9b-it',
     ],
     [
         'Qwen/Qwen2-72B-Instruct',
-        'microsoft/WizardLM-2-8x22B',
+        'google/gemma-2-27b-it',
         'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
-        # 'deepseek-ai/deepseek-llm-67b-chat', # can swap for `lite` if we want to reduce cost further
     ],
     'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo',
 ]
@@ -54,11 +51,6 @@ print("GSM8K Now...")
 Task1 = GSM8KDataset()
 API1 = TogetherAIAPI(TaskData=Task1)
 results = []
-c_results = {}
-
-c_results['FrugalGPT 2-level'] = FrugalGPT(
-    API1, Task1, single_models_cascade_2level, train=True
-).inference_cascade()
 
 for model in single_models:
     print(f"Running inference on {model}...")
@@ -74,6 +66,11 @@ for model in single_models:
         "cost": total_cost,
         "avg_latency": avg_latency,
     })
+c_results = {}
+
+c_results['FrugalGPT 2-level'] = FrugalGPT(
+    API1, Task1, single_models_cascade_2level, train=True
+).inference_cascade()
 
 c_results['MoT-LLM Cascade 2-level'] = MOTLLMCascade(
     ServiceProvider=API1,
