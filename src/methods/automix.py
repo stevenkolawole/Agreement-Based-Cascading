@@ -148,7 +148,11 @@ class AutoMix(CascadeMethod):
         for prompt, answer in zip(prompts, answers):
             verifier_prompt = self._make_verifier_input(prompt, answer)
             # K times = 8
-            verifier_responses = self.generate_inference(verifier_prompt, model, temp=1.0, n=8, add_task_fewshot=False)
+            try:
+                verifier_responses = self.generate_inference(verifier_prompt, model, temp=1.0, n=8, add_task_fewshot=False)
+            except Exception as e:
+                verifier_responses = self.generate_inference(verifier_prompt, model, temp=1.0, n=4, add_task_fewshot=False)
+                print(f"Rate limit issues; halving `k` to 4...")
             score = self._compute_verification_score(verifier_responses)
             verifier_scores.append(score)
         return verifier_scores

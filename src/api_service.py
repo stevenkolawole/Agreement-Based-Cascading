@@ -4,6 +4,30 @@ from typing import List, Tuple, Union
 from together import Together
 from openai import OpenAI
 
+from together import error as together_error
+
+
+class APICallHandler:
+    MAX_RETRIES = 3
+    RETRY_DELAY = 5 # seconds
+
+    @staticmethod
+    def handle_api_call(func):
+        def wrapper(*args, **kwargs):
+            for attempt in range(APICallHandler.MAX_RETRIES):
+                try:
+                    return func(*args, **kwargs)
+                except together_error.ServiceUnavailableError as e:
+                    if attempt < APICallHandler.MAX_RETRIES - 1:
+                        print(f"Service unavailable. Retrying in {APICallHandler.RETRY_DELAY} seconds... (Attempt {attempt + 1}/APICallHandler.MAX_RETRIES})")
+                        time.sleep(APICallHandler.RETRY_DELAY)
+                    else:
+                        print(f"Max retries reached. Unable to complete the API call.")
+                        raise
+                except Exception as e:
+                    print(f"An unexpected error occurred: {str(e)}")
+                    raise
+        return wrapper
 
 class ServiceProvider:
     required_attributes = ["API_KEY"]
@@ -12,6 +36,7 @@ class ServiceProvider:
         self.client = self.Provider(api_key=self.API_KEY)
         self.TEMPLATE = TaskData.base_prompt
 
+    @APICallHandler.handle_api_call
     def call_api(self, prompt: str, model: str, temperature: float = 0.6, n: int = 1, add_task_fewshot: bool = True) -> Tuple[str, int]:
         if add_task_fewshot:
             prompt = self.TEMPLATE + prompt
