@@ -12,8 +12,8 @@ os.environ['TOGETHER_API_KEY'] = '5de421f4d56d44ac7400e98c3cac5dc98e184bc92e297e
 
 ensemble_cascade_2level = [
     [
-        # 'meta-llama/Meta-Llama-3-8B-Instruct-Lite',
-        'meta-llama/Llama-3.2-3B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3-8B-Instruct-Lite',
+        # 'meta-llama/Llama-3.2-3B-Instruct-Turbo',
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
         'google/gemma-2-9b-it',
     ],
@@ -22,8 +22,8 @@ ensemble_cascade_2level = [
 
 ensemble_cascade_3level = [
     [
-        # 'meta-llama/Meta-Llama-3-8B-Instruct-Lite',
-        'meta-llama/Llama-3.2-3B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3-8B-Instruct-Lite',
+        # 'meta-llama/Llama-3.2-3B-Instruct-Turbo',
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
         'google/gemma-2-9b-it',
     ],
@@ -54,60 +54,64 @@ Task1 = GSM8KDataset()
 API1 = TogetherAIAPI(TaskData=Task1)
 results = []
 
-for model in single_models:
-    print(f"Running inference on {model}...")
-    single_run = EnsembleCascade( 
-        # ensemble cascade works well for just a single model, if only one model is passed in
-        API1, Task1, [model],
-    )
-    accurracy, avg_latency, total_cost = single_run.inference_cascade()
-    print(accurracy, avg_latency, total_cost)
-    results.append({
-        "model": model.split('/')[-1],
-        "accuracy": accurracy,
-        "cost": total_cost,
-        "avg_latency": avg_latency,
-    })
+# for model in single_models:
+#     print(f"Running inference on {model}...")
+#     single_run = EnsembleCascade( 
+#         # ensemble cascade works well for just a single model, if only one model is passed in
+#         API1, Task1, [model],
+#     )
+#     accurracy, avg_latency, total_cost = single_run.inference_cascade()
+#     print(accurracy, avg_latency, total_cost)
+#     results.append({
+#         "model": model.split('/')[-1],
+#         "accuracy": accurracy,
+#         "cost": total_cost,
+#         "avg_latency": avg_latency,
+#     })
 c_results = {}
 
-c_results['FrugalGPT 2-level'] = FrugalGPT(
-    API1, Task1, single_models_cascade_2level, train=True
-).inference_cascade()
+# c_results['FrugalGPT 2-level'] = FrugalGPT(
+#     API1, Task1, single_models_cascade_2level, train=True
+# ).inference_cascade()
 
-c_results['MoT-LLM Cascade 2-level'] = MOTLLMCascade(
-    ServiceProvider=API1,
-    TaskData=Task1,
-    cascade_tier_models=single_models_cascade_2level,
-).inference_cascade()
+# c_results['MoT-LLM Cascade 2-level'] = MOTLLMCascade(
+#     ServiceProvider=API1,
+#     TaskData=Task1,
+#     cascade_tier_models=single_models_cascade_2level,
+# ).inference_cascade()
 
-c_results['CoE 2-level'] = EnsembleCascade(
-    ServiceProvider=API1,
-    TaskData=Task1,
-    cascade_tier_models=ensemble_cascade_2level
-).inference_cascade()
+# c_results['CoE 2-level'] = EnsembleCascade(
+#     ServiceProvider=API1,
+#     TaskData=Task1,
+#     cascade_tier_models=ensemble_cascade_2level
+# ).inference_cascade()
 
-c_results['AutoMix_T 2-level'] = AutoMix(API1, Task1, 
-    single_models_cascade_2level,
-    routing_strategy="threshold", # or "pomdp",
-    train=True
-).inference_cascade()
+# c_results['AutoMix_T 2-level'] = AutoMix(API1, Task1, 
+#     single_models_cascade_2level,
+#     routing_strategy="threshold", # or "pomdp",
+#     train=True
+# ).inference_cascade()
 
-c_results['AutoMix_P 2-level'] = AutoMix(API1, Task1, 
-    single_models_cascade_2level,
-    routing_strategy="pomdp", # or "pomdp",
-    train=True
-).inference_cascade()
+# c_results['AutoMix_P 2-level'] = AutoMix(API1, Task1, 
+#     single_models_cascade_2level,
+#     routing_strategy="pomdp", # or "pomdp",
+#     train=True
+# ).inference_cascade()
 
-c_results['MoT-LLM Cascade 3-level'] = MOTLLMCascade(
-    ServiceProvider=API1,
-    TaskData=Task1,
-    cascade_tier_models=single_models_cascade_3level,
-).inference_cascade()
+# c_results['MoT-LLM Cascade 3-level'] = MOTLLMCascade(
+#     ServiceProvider=API1,
+#     TaskData=Task1,
+#     cascade_tier_models=single_models_cascade_3level,
+# ).inference_cascade()
 
-c_results['CoE 3-level'] = EnsembleCascade(
-    ServiceProvider=API1,
-    TaskData=Task1,
-    cascade_tier_models=ensemble_cascade_3level
+# c_results['CoE 3-level'] = EnsembleCascade(
+#     ServiceProvider=API1,
+#     TaskData=Task1,
+#     cascade_tier_models=ensemble_cascade_3level
+# ).inference_cascade()
+
+c_results['FrugalGPT 3-level'] = FrugalGPT(
+    API1, Task1, single_models_cascade_3level, train=True
 ).inference_cascade()
 
 c_results['AutoMix_T 3-level'] = AutoMix(API1, Task1, 
@@ -120,10 +124,6 @@ c_results['AutoMix_P 3-level'] = AutoMix(API1, Task1,
     single_models_cascade_3level,
     routing_strategy="pomdp", # or "pomdp",
     train=True
-).inference_cascade()
-
-c_results['FrugalGPT 3-level'] = FrugalGPT(
-    API1, Task1, single_models_cascade_3level, train=True
 ).inference_cascade()
 
 for k, v in c_results.items():
