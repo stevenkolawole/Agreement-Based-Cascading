@@ -1,4 +1,4 @@
-import re, os
+import re, os, time
 from typing import List, Tuple, Union
 
 from together import Together
@@ -19,7 +19,7 @@ class APICallHandler:
                     return func(*args, **kwargs)
                 except together_error.ServiceUnavailableError as e:
                     if attempt < APICallHandler.MAX_RETRIES - 1:
-                        print(f"Service unavailable. Retrying in {APICallHandler.RETRY_DELAY} seconds... (Attempt {attempt + 1}/APICallHandler.MAX_RETRIES})")
+                        print(f"Service unavailable. Retrying in {APICallHandler.RETRY_DELAY} seconds... (Attempt {attempt + 1}/{APICallHandler.MAX_RETRIES})")
                         time.sleep(APICallHandler.RETRY_DELAY)
                     else:
                         print(f"Max retries reached. Unable to complete the API call.")
