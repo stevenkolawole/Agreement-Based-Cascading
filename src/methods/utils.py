@@ -29,7 +29,7 @@ def calculate_f1(preds: List[str], true_labels: List[str]) -> float:
     return f1_score(normalized_labels, normalized_preds, average="macro")
 
 def normalize_answer(answer: str) -> str:
-    answer = answer.lower()
+    answer = str(answer).lower()
     answer = re.sub(r'[^\w\s]', '', answer)
     answer = re.sub(r'\b(the|a|an)\b', '', answer)
     answer = re.sub(r'\s+', ' ', answer).strip()
