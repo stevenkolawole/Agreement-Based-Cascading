@@ -334,33 +334,24 @@ API4 = TogetherAIAPI(TaskData=Task4)
 
 results = []
 
-for model in single_models:
-    print(f"Running inference on {model}...")
-    single_run = EnsembleCascade( 
-        # ensemble cascade works well for just a single model, if only one model is passed in
-        API4, Task4, [model],
-    )
-    accurracy, avg_latency, total_cost = single_run.inference_cascade()
-    print(accurracy, avg_latency, total_cost)
-    results.append({
-        "model": model.split('/')[-1],
-        "accuracy": accurracy,
-        "cost": total_cost,
-        "avg_latency": avg_latency,
-    })
-
 c_results = {}
-
-c_results['MoT-LLM Cascade 2-level'] = MOTLLMCascade(
-    ServiceProvider=API4,
-    TaskData=Task4,
-    cascade_tier_models=single_models_cascade_2level,
-).inference_cascade()
 
 c_results['CoE 2-level'] = EnsembleCascade(
     ServiceProvider=API4,
     TaskData=Task4,
     cascade_tier_models=ensemble_cascade_2level
+).inference_cascade()
+
+c_results['CoE 3-level'] = EnsembleCascade(
+    ServiceProvider=API4,
+    TaskData=Task4,
+    cascade_tier_models=ensemble_cascade_3level
+).inference_cascade()
+
+c_results['MoT-LLM Cascade 2-level'] = MOTLLMCascade(
+    ServiceProvider=API4,
+    TaskData=Task4,
+    cascade_tier_models=single_models_cascade_2level,
 ).inference_cascade()
 
 c_results['AutoMix_T 2-level'] = AutoMix(API4, Task4, 
@@ -383,12 +374,6 @@ c_results['MoT-LLM Cascade 3-level'] = MOTLLMCascade(
     ServiceProvider=API4,
     TaskData=Task4,
     cascade_tier_models=single_models_cascade_3level,
-).inference_cascade()
-
-c_results['CoE 3-level'] = EnsembleCascade(
-    ServiceProvider=API4,
-    TaskData=Task4,
-    cascade_tier_models=ensemble_cascade_3level
 ).inference_cascade()
 
 c_results['AutoMix_T 3-level'] = AutoMix(API4, Task4, 
@@ -414,6 +399,22 @@ for k, v in c_results.items():
     "cost": v[2],
     "avg_latency": v[1],
 })
+    
+
+for model in single_models:
+    print(f"Running inference on {model}...")
+    single_run = EnsembleCascade( 
+        # ensemble cascade works well for just a single model, if only one model is passed in
+        API4, Task4, [model],
+    )
+    accurracy, avg_latency, total_cost = single_run.inference_cascade()
+    print(accurracy, avg_latency, total_cost)
+    results.append({
+        "model": model.split('/')[-1],
+        "accuracy": accurracy,
+        "cost": total_cost,
+        "avg_latency": avg_latency,
+    })
 
 df_results = pd.DataFrame(results)
 

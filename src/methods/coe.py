@@ -3,7 +3,8 @@ from typing import List, Tuple, Union
 from collections import Counter
 
 from .base_cascade import CascadeMethod
-from .utils import extract_answer
+from .utils import extract_answer, calculate_f1
+from ..dataloaders import CoQADataset # need it to check for F1
 
 
 class EnsembleCascade(CascadeMethod):
@@ -27,9 +28,18 @@ class EnsembleCascade(CascadeMethod):
             for tier in range(self.n_tiers):
                 responses = self.generate_inference(prompt=prompt, models=self.cascade_models[tier])
                 f_responses = extract_answer(responses, self.Task.label_regex)
-                # if tier != (self.n_tiers - 1): # don't bother for the last layer
-                majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
-                consistency = (majority_count / len(f_responses)) >= self._threshold
+                if isinstance(self.Task, CoQADataset): # more nuanced measure of consistency is needed
+                    f1_scores = []
+                    for i, pred_i in enumerate(f_responses):
+                        for j, pred_j in enumerate(f_responses):
+                            if i != j:
+                                f1_scores.append(calculate_f1([pred_i], [pred_j][0]))
+                    consistency = (sum(f1_scores) / len(f1_scores)) >= 0.6 # hardcoded for now; 
+                    print(f1_scores)
+                    majority_answer = max(set(f_responses), key=f_responses.count)
+                else:
+                    majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
+                    consistency = (majority_count / len(f_responses)) >= self._threshold
                 if consistency and majority_answer != "": 
                     break
             # print("Exiting at tier ", tier)
