@@ -29,13 +29,13 @@ class EnsembleCascade(CascadeMethod):
                 responses = self.generate_inference(prompt=prompt, models=self.cascade_models[tier])
                 f_responses = extract_answer(responses, self.Task.label_regex)
                 if isinstance(self.Task, CoQADataset): # more nuanced measure of consistency is needed
-                    f1_scores = []
+                    labels_for_f1 = []
                     for i, pred_i in enumerate(f_responses):
                         for j, pred_j in enumerate(f_responses):
                             if i != j:
-                                f1_scores.append(calculate_f1([pred_i], [pred_j][0]))
-                    consistency = (sum(f1_scores) / len(f1_scores)) >= 0.6 # hardcoded for now; 
-                    print(f1_scores)
+                                labels_for_f1.append((pred_i, pred_j))
+                    group_preds = list(zip(*labels_for_f1))
+                    consistency = calculate_f1(group_preds[0], group_preds[1]) >= 0.6 # hardcoded for now; 
                     majority_answer = max(set(f_responses), key=f_responses.count)
                 else:
                     majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
