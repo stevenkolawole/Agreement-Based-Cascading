@@ -23,14 +23,14 @@ def calculate_accuracy(preds: List[str], true_labels: List[str]) -> float:
     return correct_count / len(preds)
 
 
-def calculate_f1(preds: List[str], true_labels: List[str]) -> float:
+def calculate_f1(preds: List[str], true_labels: List[str], average="macro") -> float:
     normalized_preds = [normalize_answer(pred) for pred in preds]
     normalized_labels = [normalize_answer(label) for label in true_labels]
-    return f1_score(normalized_labels, normalized_preds, average="macro")
+    return f1_score(normalized_labels, normalized_preds, average=average)
 
 def normalize_answer(answer: str) -> str:
     answer = str(answer).lower()
-    answer = re.sub(r'[^\w\s]', '', answer)
+    answer = re.sub(r'[^\w\s-]', '', answer)
     answer = re.sub(r'\b(the|a|an)\b', '', answer)
     answer = re.sub(r'\s+', ' ', answer).strip()
     return answer
