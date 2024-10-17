@@ -35,7 +35,7 @@ class EnsembleCascade(CascadeMethod):
                 if isinstance(self.Task, CoQADataset): # more nuanced measure of consistency is needed
                     consistency_score = calculate_f1_for_text_similarity(f_responses)
                     # print("Consistency score:", consistency_score, f_responses)
-                    consistency = consistency_score >= 0.3 # hardcoded for now
+                    consistency = consistency_score >= 1.0 # hardcoded for now
                     majority_answer = max(set(f_responses), key=f_responses.count)
                 else:
                     majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
