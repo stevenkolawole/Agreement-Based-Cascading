@@ -35,7 +35,7 @@ class EnsembleCascade(CascadeMethod):
                 if isinstance(self.Task, CoQADataset): # more nuanced measure of consistency is needed
                     consistency_score = calculate_f1_for_text_similarity(f_responses)
                     # print("Consistency score:", consistency_score, f_responses)
-                    consistency = consistency_score >= 1.0 # hardcoded for now
+                    consistency = consistency_score >= self._threshold
                     majority_answer = max(set(f_responses), key=f_responses.count)
                 else:
                     majority_answer, majority_count = Counter(f_responses).most_common(1)[0]
@@ -72,27 +72,3 @@ def calculate_f1_for_text_similarity(responses: List[str]) -> float:
     
     average_similarity = total_similarity / comparisons if comparisons > 0 else 0
     return average_similarity
-    
-def calculate_f1_for_coqa(responses: List[str], average="macro") -> float:
-    normalized_responses = [normalize_answer(resp) for resp in responses]
-    n = len(normalized_responses)
-    
-    # Create all pairwise comparisons
-    labels, references = [], []
-    for i in range(n):
-        for j in range(i+1, n):  # Start from i+1 to avoid self-comparison and duplicates
-            labels.append(normalized_responses[i])
-            references.append(normalized_responses[j])
-            # Add the reverse comparison as well
-            labels.append(normalized_responses[j])
-            references.append(normalized_responses[i])
-    
-    # Convert to binary vectors for each unique answer
-    unique_answers = list(set(normalized_responses))
-    binary_labels = [[1 if l == ua else 0 for ua in unique_answers] for l in labels]
-    binary_references = [[1 if r == ua else 0 for ua in unique_answers] for r in references]
-    
-    # Calculate F1 score
-    f1 = f1_score(binary_references, binary_labels, average=average, zero_division=1)
-    
-    return f1
