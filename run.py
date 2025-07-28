@@ -45,7 +45,7 @@ single_models_cascade_3level = [
 
 def run_single_model(api, task, model):
     print(f"Running inference on {model}...")
-    single_run = EnsembleCascade(api, task, [model])
+    single_run = EnsembleCascade(api, task, [model]) # EnsembleCascade defaults to single model inference when only one model is provided
     accuracy, avg_latency, total_cost = single_run.inference_cascade() # add `len_data=10` as argument for testing
     return {"model": model.split('/')[-1], "accuracy": accuracy, "cost": total_cost, "avg_latency": avg_latency}
 
@@ -74,7 +74,8 @@ def evaluate_models(task_class, task_name, configs):
         })
 
     df_results = pd.DataFrame(results)
-    df_results.to_csv(f"cascade_results_{task_name}.csv", index=False)
+    os.makedirs("results", exist_ok=True)
+    df_results.to_csv(f"results/cascade_results_{task_name}.csv", index=False)
     print(df_results)
 
 def main():
