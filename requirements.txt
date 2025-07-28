@@ -1,0 +1,12 @@
+pandas
+scipy
+openai
+together
+datasets
+scikit-learn
+transformers
+torch
+torchvision
+torchaudio
+nltk
+evaluate
