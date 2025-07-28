@@ -14,7 +14,7 @@ This codebase implements the experiments from **Section 5.2.3** of the ABC paper
 # Install dependencies
 pip install -r requirements.txt
 
-# Set your Together.ai API key ## can be updated directly in the `run` python scripts or notebook
+# Set your Together.ai API key
 export TOGETHER_API_KEY="your_api_key_here"
 ```
 
