@@ -1,4 +1,4 @@
-# Agreement-Based Cascading (ABC) - API-Based Experiments
+# Agreement-Based Cascading (ABC) for Efficient Inference
 
 [![TMLR](https://img.shields.io/badge/TMLR-July%202025-blue)](https://openreview.net/forum?id=jn9B7LMlzk)
 
@@ -35,6 +35,7 @@ python run.py
 
 # Quick test with limited data
 # Modify run.py line 49: add `len_data=10` parameter to inference_cascade()
+# use run.ipynb for iterative testing/analysis.
 ```
 
 ### Manual Configuration
@@ -65,7 +66,7 @@ abc = EnsembleCascade(
     api, 
     task, 
     cascade_tiers,
-    agreement_threshold=1.0  # Require full agreement (can be relaxed to 0.67 for 2/3 majority)
+    agreement_threshold=1.0 
 )
 
 accuracy, avg_latency, total_cost = abc.inference_cascade()
@@ -97,7 +98,7 @@ The main experiment in `run.py` compares:
 
 1. **Single Models**: All individual models for baseline comparison  
 2. **ABC (CoE)**: 2-level and 3-level ensemble cascades  
-3. **Baseline Methods**: AutoMix, FrugalGPT, MoT-LLM Cascade
+3. **Baseline Methods**: 2-level and 3-level of AutoMix, FrugalGPT, MoT-LLM Cascade systems
 
 ### Model Tiers Used
 
@@ -162,7 +163,7 @@ abc = EnsembleCascade(api, task, cascade_tiers, agreement_threshold=0.67)
 For development/testing, limit the dataset size:
 
 ```python
-# In run.py, line 67, add len_data parameter:
+# In run.py, line 49, add len_data parameter:
 accuracy, avg_latency, total_cost = method.inference_cascade(len_data=10)
 ```
 
@@ -179,7 +180,11 @@ accuracy, avg_latency, total_cost = method.inference_cascade(len_data=10)
 - **Rate Limits**: Built-in retry mechanism handles temporary API failures  
 - **Model Availability**: Ensure all models in cascade tiers are available on Together.ai
 
+---
+
 ## 📄 Citation
+
+If you the work useful, cite:
 
 ```bibtex
 @article{kolawole2025abc,
