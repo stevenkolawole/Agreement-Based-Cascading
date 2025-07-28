@@ -134,20 +134,6 @@ Results are saved as CSV files. Each contains accuracy, cost, and latency metric
 
 ## ⚙️ Customization
 
-### Adding New Datasets
-
-1. Create a new dataset class in `src/dataloaders.py`:
-
-```python
-class YourDataset(Dataset):
-    data_url = "huggingface/dataset-name"
-    query_column = "input_text"
-    label_column = "label"
-    PROMPT_PREFIX_FILE = "src/prompt_templates/your_task.txt"
-```
-
-2. Add the prompt template in `src/prompt_templates/your_task.txt`
-
 ### Adjusting Agreement Threshold
 
 ```python
@@ -158,6 +144,8 @@ abc = EnsembleCascade(api, task, cascade_tiers, agreement_threshold=1.0)
 abc = EnsembleCascade(api, task, cascade_tiers, agreement_threshold=0.67)
 ```
 
+---
+
 ### Testing Mode
 
 For development/testing, limit the dataset size:
@@ -166,6 +154,71 @@ For development/testing, limit the dataset size:
 # In run.py, line 49, add len_data parameter:
 accuracy, avg_latency, total_cost = method.inference_cascade(len_data=10)
 ```
+
+---
+
+### Adding New Datasets
+
+Create a new dataset class in `src/dataloaders.py`:
+
+```python
+class YourDataset(Dataset):
+    data_url = "huggingface/dataset-name"
+    query_column = "input_text"
+    label_column = "label"
+    PROMPT_PREFIX_FILE = "src/prompt_templates/your_task.txt"
+```
+
+Add the prompt template in `src/prompt_templates/your_task.txt`
+
+---
+
+### Adding New API Providers
+
+The current implementation supports Together.ai with a placeholder for OpenAI. To add new API providers:
+
+1. Create a new API service class in `src/api_service.py`:
+
+```python
+class YourAPIService(ServiceProvider):
+    Provider = YourAPIClient  # Your API client library
+    API_KEY = os.getenv('YOUR_API_KEY')
+    
+    def calculate_cost(self, model: str, total_tokens: int) -> float:
+        # Implement your provider's pricing logic
+        price_per_million = self.get_model_price(model)
+        return (total_tokens / 1_000_000) * price_per_million
+```
+
+The base `ServiceProvider` class handles the common API call interface, so you only need to implement cost calculation specific to your provider.
+
+Use your new service:
+
+```python
+from src.api_service import YourAPIService
+
+api = YourAPIService(TaskData=task)
+abc = EnsembleCascade(api, task, cascade_tiers)
+```
+
+> **Note**: The OpenAI implementation is currently incomplete — the `calculate_cost` method needs to be implemented with OpenAI's pricing structure.
+
+---
+
+### Adding New Cascade Methods
+
+To implement custom cascade methods, inherit from `CascadeMethod` in `src/methods/base_cascade.py`:
+
+```python
+class YourCascadeMethod(CascadeMethod):
+    def _inference_cascade(self, prompts: List[str]) -> Tuple[List[str], float]:
+        # Implement your custom cascade logic
+        # Return predictions and average latency
+        pass
+```
+
+---
+
 
 ## 🔬 Key Features
 
@@ -184,7 +237,7 @@ accuracy, avg_latency, total_cost = method.inference_cascade(len_data=10)
 
 ## 📄 Citation
 
-If you the work useful, cite:
+If you find the work/codebase useful or relevant, please cite:
 
 ```bibtex
 @article{kolawole2025abc,
