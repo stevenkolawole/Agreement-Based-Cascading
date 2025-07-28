@@ -8,7 +8,7 @@ from src.api_service import TogetherAIAPI, OpenAIAPI
 
 
 import os
-os.environ['TOGETHER_API_KEY'] = '5de421f4d56d44ac7400e98c3cac5dc98e184bc92e297e552aadd7198def0661'
+os.environ['TOGETHER_API_KEY'] = 'your_together_api_key_here'  # Replace with your actual API key
 
 ensemble_cascade_2level = [
     [
