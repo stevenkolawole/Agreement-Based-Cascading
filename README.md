@@ -169,7 +169,7 @@ accuracy, avg_latency, total_cost = method.inference_cascade(len_data=10)
 
 ## 🔬 Key Features
 
-- **Training-Free**: ABC requires no additional training unlike AutoMix/FrugalGPT  
+- **Training-Free**: ABC requires no additional training  
 - **Black-Box Compatible**: Works with any API that returns text responses  
 - **Parallel Ensemble Execution**: Tier 1 models run in parallel for speed  
 - **Comprehensive Baselines**: Fair comparison with SOTA cascade methods
