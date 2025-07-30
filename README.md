@@ -244,7 +244,7 @@ If you find the work/codebase useful or relevant, please cite:
   title={Agreement-Based Cascading for Efficient Inference},
   author={Steven Kolawole and Don Dennis and Ameet Talwalkar and Virginia Smith},
   journal={Transactions on Machine Learning Research},
-  year={2025}
+  year={2025},
   month={7},
   url={https://openreview.net/forum?id=jn9B7LMlzk}
 }
