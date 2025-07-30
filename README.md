@@ -242,7 +242,7 @@ If you find the work/codebase useful or relevant, please cite:
 ```bibtex
 @article{kolawole2025abc,
   title={Agreement-Based Cascading for Efficient Inference},
-  author={Kolawole, Steven and Dennis, Don and Talwalkar, Ameet and Smith, Virginia},
+  author={Steven Kolawole and Don Dennis and Ameet Talwalkar and Virginia Smith},
   journal={Transactions on Machine Learning Research},
   year={2025}
   month={7},
