@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Agreement-Based Cascading for Efficient Inference"
+type: software
+authors: [{family-names: Kolawole, given-names: Steven}, {family-names: Dennis, given-names: Don}, {family-names: Talwalkar, given-names: Ameet}, {family-names: Smith, given-names: Virginia}]
+repository-code: "https://github.com/stevenkolawole/Agreement-Based-Cascading"
+url: "https://openreview.net/forum?id=jn9B7LMlzk"
+license: MIT
+version: 1.0.1
+date-released: 2026-10-27
+abstract: "Training-free LLM cascades that defer using ensemble agreement, with FrugalGPT, AutoMix and MoT baselines on black-box APIs."
+preferred-citation: {type: article, title: "Agreement-Based Cascading for Efficient Inference", authors: [{family-names: Kolawole, given-names: Steven}, {family-names: Dennis, given-names: Don}, {family-names: Talwalkar, given-names: Ameet}, {family-names: Smith, given-names: Virginia}], journal: "Transactions on Machine Learning Research", year: 2025, url: "https://openreview.net/forum?id=jn9B7LMlzk"}
