@@ -1,8 +1,12 @@
 # Agreement-Based Cascading (ABC) for Efficient Inference
 
-[![TMLR](https://img.shields.io/badge/TMLR-July%202025-blue)](https://openreview.net/forum?id=jn9B7LMlzk)
+[![TMLR](https://img.shields.io/badge/TMLR-July%202025-blue)](https://openreview.net/forum?id=jn9B7LMlzk) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23600473.svg)](https://doi.org/10.5281/zenodo.23600473) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 This repository contains the implementation for **API-based experiments** from the ABC paper, comparing Agreement-Based Cascading with state-of-the-art methods like FrugalGPT, AutoMix, and MoT-LLM Cascade on black-box LLM APIs.
+
+**In plain language:** Large AI models give strong answers but are expensive to run. ABC first asks a small group of cheaper models the same question. If they agree, their answer is used. Only when they disagree is the question passed to a larger, costlier model. This can cut costs substantially while keeping accuracy competitive, needs no extra training, and works with models that are only available through an API.
+
+**Version:** 1.0.1 (October 2026). Archived releases are listed on [GitHub Releases](https://github.com/stevenkolawole/Agreement-Based-Cascading/releases) and on [Zenodo](https://doi.org/10.5281/zenodo.23600473).
 
 ## 🎯 Overview
 
@@ -132,6 +136,8 @@ Example cost breakdown (per million tokens):
 
 Results are saved as CSV files. Each contains accuracy, cost, and latency metrics for all methods.
 
+The committed results folder holds one file per dataset, named single_models_DATASET.csv (DATASET is one of coqa, gsm8k, headlines, overruling). Each row is one model, with the columns model, accuracy, cost and avg_latency.
+
 ## ⚙️ Customization
 
 ### Adjusting Agreement Threshold
@@ -249,3 +255,10 @@ If you find the work/codebase useful or relevant, please cite:
   url={https://openreview.net/forum?id=jn9B7LMlzk}
 }
 ```
+
+
+---
+
+## License
+
+This code is released under the MIT License. See [LICENSE](LICENSE).
