@@ -13,6 +13,8 @@ This repository contains the implementation for **API-based experiments** from t
 This codebase implements the experiments from **Section 5.2.3** of the ABC paper, demonstrating 2-25× cost reductions in API-based inference while maintaining competitive accuracy. ABC uses ensemble agreement (voting) as a training-free deferral mechanism for black-box model APIs.
 
 ## 🛠 Installation
+Requires Python 3.10 or newer. The version ranges in `requirements.txt` are bounded to library releases contemporary with the experiments (mid-2024).
+
 
 ```bash
 # Install dependencies
